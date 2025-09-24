@@ -24,6 +24,9 @@ runs:
 
         - name: Run setup script
           shell: bash
+          env:
+            GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
           run: |
-              chmod +x ${{ github.action_path }/setup.sh
-              ${{ github.action_path }}/setup.sh
+            chmod +x ${{ github.action_path }}/setup.sh
+            ls -al
+            pwd

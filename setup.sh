@@ -10,7 +10,14 @@ else
 fi
 
 
-cd tmp && git clone https://github.com/sourcefuse/telescope-health-patient-portal-ui.git repo
+# Check if GITHUB_TOKEN is set
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "Warning: GITHUB_TOKEN not set. Attempting clone without authentication..."
+    cd tmp && git clone https://github.com/sourcefuse/telescope-health-patient-portal-ui.git repo
+else
+    echo "Using GITHUB_TOKEN for authentication..."
+    cd tmp && git clone https://$GITHUB_TOKEN:x-oauth-basic@github.com/sourcefuse/telescope-health-patient-portal-ui.git repo
+fi
 ls
 
 # npm start
