@@ -26,4 +26,4 @@ runs:
           shell: bash
           run: |
               chmod +x setup.sh
-              ./setup.sh
+              ${{ github.action_path }}/setup.sh
