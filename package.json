@@ -1,0 +1,45 @@
+{
+  "name": "create-unit-test-cases",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "vector": "ts-node src/utils/vector-cli.ts",
+    "find-related": "ts-node src/utils/simple-search.ts",
+    "extract-keywords": "ts-node src/utils/keyword-extractor.ts",
+    "test-ai": "ts-node src/utils/openrouter-client.ts",
+    "qdrant:start": "docker-compose -f docker-compose.qdrant.yml up -d",
+    "qdrant:stop": "docker-compose -f docker-compose.qdrant.yml down",
+    "qdrant:logs": "docker-compose -f docker-compose.qdrant.yml logs -f",
+    "analyze-project": "claude --model claude-3-5-sonnet-20241022 --print --dangerously-skip-permissions < commands/generate-tests.md"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/dotenv": "^6.1.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.5.1",
+    "@types/uuid": "^10.0.0",
+    "jest": "^30.1.3",
+    "nodemon": "^3.1.10",
+    "ts-jest": "^29.4.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@qdrant/js-client-rest": "^1.15.1",
+    "axios": "^1.12.2",
+    "confluence.js": "^2.1.0",
+    "dotenv": "^17.2.2",
+    "fs-extra": "^11.3.2",
+    "uuid": "^13.0.0"
+  }
+}

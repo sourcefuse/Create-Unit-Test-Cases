@@ -1,0 +1,29 @@
+name: 'Create Unit Test Cases Via AI'
+description: 'A GitHub Action to create unit test cases via ai.'
+inputs:
+    GITHUB_TOKEN:
+        required: true
+    
+
+outputs:
+    comment_body:
+        description: 'The body of the output from the script.'
+
+permissions:
+    pull-requests: write
+    issues: write
+
+runs:
+    using: 'composite' # or 'node20' if you prefer
+    steps:
+        - name: Create timestamp and export to env
+          id: timestamp
+          shell: bash
+          run: |
+              echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
+        - name: Run setup script
+          shell: bash
+          run: |
+              chmod +x setup.sh
+              ./setup.sh
