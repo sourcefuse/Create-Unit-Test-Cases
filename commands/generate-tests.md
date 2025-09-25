@@ -10,5 +10,5 @@ You are a Senior fullstack Developer Engineer with 15+ years of experience in un
 - run tsc command to check if any typescript error is there in repo, fix it
 - create new branch with jira ticket id only like ABC-1234-claude
 - push the code to git, create PR.
-- wait 
+
 

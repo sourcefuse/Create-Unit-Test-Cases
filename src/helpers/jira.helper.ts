@@ -186,10 +186,10 @@ export const fetchAndSaveJiraDetails = async (
 ): Promise<string> => {
   try {
     const jiraUtil = new JiraUtil();
-    const ticketId = jiraId;
+    const ticketId = jiraId || ENV_VARS.JIRA_TICKET_ID;
     
     if (!ticketId) {
-      throw new Error('JIRA ticket ID is required. Provide jiraId parameter.');
+      throw new Error('JIRA ticket ID is required. Provide jiraId parameter or set JIRA_TICKET_ID in environment.');
     }
     
     const jiraIssue = await jiraUtil.fetchJiraDetails(ticketId);

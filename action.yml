@@ -75,28 +75,33 @@ runs:
           run: |
               echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
               echo "TMP_DIR_PATH=$(pwd)/tmp/repo" >> $GITHUB_ENV
-              mkdir -p ./tmp/repo
+              mkdir -p $(pwd)/tmp/repo
         
-        - name: Clone Repository into ./tmp
+        - name: Clone Repository into tmp folder
           uses: actions/checkout@v4
           with: 
             repository: ${{ inputs.REPO_PATH }}
             token: ${{ inputs.PAT_TOKEN }}
-            path: ./tmp/repo/
+            path: ${{ env.TMP_DIR_PATH }}
 
         - name: Installing Required packages.
           id: install
           shell: bash
           run: |
-              cd ./tmp/repo/ && pwd && npm install > /dev/null 2>&1
+              cd ${{ env.TMP_DIR_PATH }} && pwd && npm install > /dev/null 2>&1
               cd ${{ github.action_path }} && npm install > /dev/null 2>&1
               
+        - name: Install Claude CLI
+          shell: bash
+          env:
+            ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+          run: |
+              npm install -g @anthropic-ai/claude-code
 
         - name: Run setup script
           shell: bash
           env:
             # Required Variables from Secrets
-            CLAUDE_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
             JIRA_API_TOKEN: ${{ inputs.JIRA_API_TOKEN }}
             OPEN_ROUTER_API_KEY: ${{ inputs.OPEN_ROUTER_API_KEY }}
 
@@ -119,4 +124,25 @@ runs:
             STOP_ON_AI_ERROR: ${{ inputs.STOP_ON_AI_ERROR }}
           run: |
             npx ts-node ${{ github.action_path }}/src/index.ts
-            
+        
+        - name: Commit and Push Changes
+          shell: bash
+          working-directory: ${{ env.TMP_DIR_PATH }}
+          run: |
+              ls
+              pwd
+              git config user.name "Vishal Gupta"
+              git config user.email "${{ inputs.JIRA_EMAIL }}"
+              git status
+              # git checkout -b ai-${{ inputs.JIRA_TICKET_ID }}
+              # git add .
+              # HUSKY=0 git commit -m "AI: Add/Update unit test cases [${{ env.TIMESTAMP }}]" || echo "No changes to commit"
+              # git push origin ai-${{ inputs.JIRA_TICKET_ID }}
+
+        # - name: Run Claude Commands
+        #   shell: bash
+        #   env:
+        #     ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+        #   run: |
+        #     claude --print --dangerously-skip-permissions < ${{ github.action_path }}/commands/generate-tests.md
+        #     cd ./tmp/repo/ && git status && git add . && git commit -am "update" && git push
