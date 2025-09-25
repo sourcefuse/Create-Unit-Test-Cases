@@ -122,24 +122,23 @@ runs:
           run: |
             npx ts-node ${{ github.action_path }}/src/index.ts
         
+        - name: Run Claude Commands
+          shell: bash
+          env:
+            ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+          run: |
+            cd ${{ env.TMP_DIR_PATH }} && claude --print --dangerously-skip-permissions < ${{ github.action_path }}/commands/generate-tests.md
+
         - name: Commit and Push Changes
           shell: bash
           working-directory: ${{ env.TMP_DIR_PATH }}
           run: |
               pwd
               ls ${{ env.TMP_DIR_PATH }}
-              # git config user.name "Vishal Gupta"
-              # git config user.email "${{ inputs.JIRA_EMAIL }}"
-              # git status
-              # git checkout -b ai-${{ inputs.JIRA_TICKET_ID }}
-              # git add .
-              # HUSKY=0 git commit -m "AI: Add/Update unit test cases [${{ env.TIMESTAMP }}]" || echo "No changes to commit"
-              # git push origin ai-${{ inputs.JIRA_TICKET_ID }}
-
-        # - name: Run Claude Commands
-        #   shell: bash
-        #   env:
-        #     ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
-        #   run: |
-        #     claude --print --dangerously-skip-permissions < ${{ github.action_path }}/commands/generate-tests.md
-        #     cd ./tmp/repo/ && git status && git add . && git commit -am "update" && git push
+              git config user.name "Vishal Gupta"
+              git config user.email "${{ inputs.JIRA_EMAIL }}"
+              git status
+              git checkout -b ai-${{ inputs.JIRA_TICKET_ID }}
+              git add .
+              HUSKY=0 git commit -m "AI: Add/Update unit test cases [${{ env.TIMESTAMP }}]" || echo "No changes to commit"
+              git push origin ai-${{ inputs.JIRA_TICKET_ID }}
