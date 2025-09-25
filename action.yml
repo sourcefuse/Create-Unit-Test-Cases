@@ -1,14 +1,59 @@
 name: 'Create Unit Test Cases Via AI'
 description: 'A GitHub Action to create unit test cases via ai.'
 inputs:
+    # Required Variables from Secrets
     GITHUB_TOKEN:
+        required: true
+    CLAUDE_API_KEY:
+        required: true
+    JIRA_API_TOKEN:
         required: true
     OPEN_ROUTER_API_KEY:
         required: true
-    REPO_PATH:
-        required: true
     PAT_TOKEN:
         required: true
+
+    # Required Variables from variables
+    CONFLUENCE_URL:
+        required: true
+    JIRA_EMAIL:
+        required: true
+    JIRA_PROJECT_KEY:
+        required: true
+    JIRA_URL:
+        required: true
+    OPEN_ROUTER_API_URL:
+        required: true
+    OPEN_ROUTER_MODEL:
+        required: true
+    REPO_PATH:
+        required: true
+    
+    # Not Required Variable
+    TMP_DIR_PATH:
+        required: false
+        default: 'tmp'
+    JIRA_MARKDOWN_FILENAME:
+        required: false
+        default: 'Jira.md'
+    PROJECT_MARKDOWN_FILENAME:
+        required: false
+        default: 'Project.md'
+    JIRA_MAX_RESULT:
+        required: false
+        default: '10'
+    JIRA_FETCH_FIELDS:
+        required: false
+        default: 'key,summary,description,issuetype,priority,status'
+    CONFLUENCE_PAGE_LIMIT:
+        required: false
+        default: '100'
+    CONFLUENCE_FILTER_ENABLED:
+        required: false
+        default: 'true'
+    STOP_ON_AI_ERROR:
+        required: false
+        default: 'true'
 
 
 outputs:
@@ -39,8 +84,30 @@ runs:
         - name: Run setup script
           shell: bash
           env:
-            GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+            # Required Variables from Secrets
+            CLAUDE_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+            JIRA_API_TOKEN: ${{ inputs.JIRA_API_TOKEN }}
+            OPEN_ROUTER_API_KEY: ${{ inputs.OPEN_ROUTER_API_KEY }}
+
+            # Required Variable from Variables
+            CONFLUENCE_URL: ${{ inputs.CONFLUENCE_URL }}
+            JIRA_EMAIL: ${{ inputs.JIRA_EMAIL }}
+            JIRA_PROJECT_KEY: ${{ inputs.JIRA_PROJECT_KEY }}
+            JIRA_URL: ${{ inputs.JIRA_URL }}
+            OPEN_ROUTER_API_URL: ${{ inputs.OPEN_ROUTER_API_URL }}
+            OPEN_ROUTER_MODEL: ${{ inputs.OPEN_ROUTER_MODEL }}
+            REPO_PATH: ${{ inputs.REPO_PATH }}
+
+            # Not Required Variable
+            CONFLUENCE_FILTER_ENABLED: ${{ inputs.CONFLUENCE_FILTER_ENABLED }}
+            CONFLUENCE_PAGE_LIMIT: ${{ inputs.CONFLUENCE_PAGE_LIMIT }}
+            JIRA_FETCH_FIELDS: ${{ inputs.JIRA_FETCH_FIELDS }}
+            JIRA_MARKDOWN_FILENAME: ${{ inputs.JIRA_MARKDOWN_FILENAME }}
+            JIRA_MAX_RESULT: ${{ inputs.JIRA_MAX_RESULT }}
+            PROJECT_MARKDOWN_FILENAME: ${{ inputs.PROJECT_MARKDOWN_FILENAME }}
+            STOP_ON_AI_ERROR: ${{ inputs.STOP_ON_AI_ERROR }}
+            TMP_DIR_PATH: ${{ inputs.TMP_DIR_PATH }}
           run: |
-            ls -al
-            pwd
-            cd tmp/repo/ && ls
+            npx ts-node ${{ github.action_path }}/main.ts
+            cd tmp/ && ls
+            
