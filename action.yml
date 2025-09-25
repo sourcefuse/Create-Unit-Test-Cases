@@ -127,7 +127,7 @@ runs:
           working-directory: ${{ env.TMP_DIR_PATH }}
           run: |
               pwd
-              ls ${{ github.action_path }}
+              ls ${{ env.TMP_DIR_PATH }}
               # cp -aRp ${{ github.action_path }}/tmp/* ./
               # git config user.name "Vishal Gupta"
               # git config user.email "${{ inputs.JIRA_EMAIL }}"
