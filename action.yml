@@ -3,7 +3,13 @@ description: 'A GitHub Action to create unit test cases via ai.'
 inputs:
     GITHUB_TOKEN:
         required: true
-    
+    OPEN_ROUTER_API_KEY:
+        required: true
+    REPO_PATH:
+        required: true
+    PAT_TOKEN:
+        required: true
+
 
 outputs:
     comment_body:
@@ -21,12 +27,20 @@ runs:
           shell: bash
           run: |
               echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+        
+        - name: Clone Repository into ./tmp
+          uses: actions/checkout@v4
+          with: 
+            repository: ${{ inputs.REPO_PATH }}
+            token: ${{ inputs.PAT_TOKEN }}
+            path: ./tmp/repo
 
         - name: Run setup script
           shell: bash
           env:
             GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
           run: |
-            chmod +x ${{ github.action_path }}/setup.sh
             ls -al
             pwd
+            cd tmp && ls
+            cd tmp/repo && ls
