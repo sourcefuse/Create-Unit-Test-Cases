@@ -73,6 +73,7 @@ runs:
           run: |
               echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
               mkdir -p tmp/repo
+              cd ${{ github.action_path }} && npm install
         
         - name: Clone Repository into ./tmp
           uses: actions/checkout@v4
@@ -80,6 +81,13 @@ runs:
             repository: ${{ inputs.REPO_PATH }}
             token: ${{ inputs.PAT_TOKEN }}
             path: ./tmp/repo/
+
+        - name: Installing Required packages.
+          id: install
+          shell: bash
+          run: |
+              cd ${{ github.action_path }} && npm install
+              cd tmp/repo/ && npm install
 
         - name: Run setup script
           shell: bash
