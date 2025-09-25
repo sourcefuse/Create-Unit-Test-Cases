@@ -21,9 +21,10 @@ export const ENV_VARS = {
   JIRA_API_TOKEN: process.env.JIRA_API_TOKEN || '',
   JIRA_URL: process.env.JIRA_URL || '',
   JIRA_PROJECT_KEY: process.env.JIRA_PROJECT_KEY || '',
+  JIRA_TICKET_ID: process.env.JIRA_TICKET_ID, // Optional: Specific JIRA issue ID to fetch
   JIRA_MAX_RESULT: process.env.JIRA_MAX_RESULT || '10',
   JIRA_FETCH_FIELDS: process.env.JIRA_FETCH_FIELDS || 'key,summary,description,issuetype,priority,status',
-  JIRA_TICKET_ID: process.env.JIRA_TICKET_ID, // Optional: Specific JIRA issue ID to fetch
+  
   
   // File Path Configuration
   TMP_DIR_PATH: process.env.TMP_DIR_PATH || './tmp',
@@ -50,6 +51,7 @@ export const validateEnvironment = (): string[] => {
     'JIRA_API_TOKEN',
     'JIRA_URL',
     'JIRA_PROJECT_KEY',
+    'JIRA_TICKET_ID'
   ];
 
   return required.filter(key => !ENV_VARS[key]);
@@ -65,6 +67,7 @@ export const validateConfluenceEnvironment = (): string[] => {
     'JIRA_EMAIL',
     'JIRA_API_TOKEN',
     'JIRA_PROJECT_KEY',
+    'JIRA_TICKET_ID'
   ];
 
   return required.filter(key => !ENV_VARS[key]);
