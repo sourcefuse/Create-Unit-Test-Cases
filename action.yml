@@ -74,8 +74,8 @@ runs:
           shell: bash
           run: |
               echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
-              echo "TMP_DIR_PATH=$(pwd)/tmp/repo" >> $GITHUB_ENV
-              mkdir -p $(pwd)/tmp/repo
+              echo "TMP_DIR_PATH=${{ github.action_path }}/tmp/repo" >> $GITHUB_ENV
+              mkdir -p ${{ github.action_path }}/tmp/repo
         
         - name: Clone Repository into tmp folder
           uses: actions/checkout@v4
@@ -130,11 +130,12 @@ runs:
           working-directory: ${{ env.TMP_DIR_PATH }}
           run: |
               pwd
-              ls
-              cp -aRp ${{ github.action_path }}/tmp/* ./
-              git config user.name "Vishal Gupta"
-              git config user.email "${{ inputs.JIRA_EMAIL }}"
-              git status
+              ls ${{ github.action_path }}
+              ls ${{ github.action_path }}/tmp
+              # cp -aRp ${{ github.action_path }}/tmp/* ./
+              # git config user.name "Vishal Gupta"
+              # git config user.email "${{ inputs.JIRA_EMAIL }}"
+              # git status
               # git checkout -b ai-${{ inputs.JIRA_TICKET_ID }}
               # git add .
               # HUSKY=0 git commit -m "AI: Add/Update unit test cases [${{ env.TIMESTAMP }}]" || echo "No changes to commit"
