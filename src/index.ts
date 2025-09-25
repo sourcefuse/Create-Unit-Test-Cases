@@ -39,7 +39,10 @@ export const main = async (): Promise<void> => {
 if (require.main === module) {
   console.log(process.env);
   const filePath = process.env.TMP_DIR_PATH+"/"+"test.md";
-
+  console.log(filePath);
   fs.writeFileSync(filePath, 'This is a sample file created by the script.');
+  console.log('File created at:', path.resolve(filePath));
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
+  console.log('File content:', fileContent);
   // main();
 }
