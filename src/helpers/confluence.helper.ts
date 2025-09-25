@@ -358,6 +358,7 @@ ${ENV_VARS.CONFLUENCE_FILTER_ENABLED ? '*Filtered based on adaptive JIRA keyword
  */
 export const fetchAndSaveConfluencePages = async (
   outputPath?: string,
+  jiraFilePath?: string,
   storeInVector: boolean = true
 ): Promise<string> => {
   try {
@@ -375,7 +376,7 @@ export const fetchAndSaveConfluencePages = async (
     let filteredPageIds: string[] = [];
     if (ENV_VARS.CONFLUENCE_FILTER_ENABLED) {
       console.log('\n🔍 Applying adaptive keyword filtering...');
-      const result = await extractKeywordsWithAdaptiveCount(minimalPages);
+      const result = await extractKeywordsWithAdaptiveCount(minimalPages, jiraFilePath);
       filteredPageIds = result.filteredPages.map(page => page.id);
       console.log(`📊 Filtered to ${filteredPageIds.length} pages from ${minimalPages.length} total`);
     } else {

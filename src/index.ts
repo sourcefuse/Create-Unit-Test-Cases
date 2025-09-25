@@ -9,6 +9,8 @@ import * as path from 'path';
  */
 export const main = async (): Promise<void> => {
   console.log('TypeScript project initialized successfully!');
+  const JiraFilePath = path.join(ENV_VARS.TMP_DIR_PATH,ENV_VARS.JIRA_MARKDOWN_FILENAME);
+  const ConfluenceFilePath = path.join(ENV_VARS.TMP_DIR_PATH,ENV_VARS.PROJECT_MARKDOWN_FILENAME);
 
   const missingVars = validateEnvironment();
   if (missingVars.length > 0) {
@@ -18,20 +20,11 @@ export const main = async (): Promise<void> => {
 
   try {
     console.log('=== Fetching JIRA Details');
-    await fetchAndSaveJiraDetails(
-      ENV_VARS.JIRA_TICKET_ID,
-      path.join(
-        ENV_VARS.TMP_DIR_PATH,
-        ENV_VARS.JIRA_MARKDOWN_FILENAME)
-    ); // JIRA data saved to file only
+    await fetchAndSaveJiraDetails(ENV_VARS.JIRA_TICKET_ID, JiraFilePath); // JIRA data saved to file only
 
     console.log('\n=== Fetching Confluence Pages with Adaptive Keyword Filtering ===');
     try {
-      await fetchAndSaveConfluencePages(
-        path.join(
-          ENV_VARS.TMP_DIR_PATH,
-          ENV_VARS.PROJECT_MARKDOWN_FILENAME)
-        , false); // Store Confluence in vector DB
+      await fetchAndSaveConfluencePages(ConfluenceFilePath, JiraFilePath ,false); // Store Confluence in vector DB
     } catch (confluenceError) {
       console.warn('Confluence fetch failed:', confluenceError instanceof Error ? confluenceError.message : 'Unknown error');
       console.warn('Continuing without Confluence documentation...');
