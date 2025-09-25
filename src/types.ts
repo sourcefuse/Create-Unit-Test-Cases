@@ -175,3 +175,11 @@ export interface ConfluenceApiError {
   message: string;
   reason?: string;
 }
+
+/**
+ * Role interface
+ */
+export interface Role {
+  id: string;
+  name: string;
+}
