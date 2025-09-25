@@ -129,8 +129,8 @@ runs:
           shell: bash
           working-directory: ${{ env.TMP_DIR_PATH }}
           run: |
-              ls
               pwd
+              ls
               git config user.name "Vishal Gupta"
               git config user.email "${{ inputs.JIRA_EMAIL }}"
               git status

@@ -20,7 +20,7 @@ export const main = async (): Promise<void> => {
     
     console.log('\n=== Fetching Confluence Pages with Adaptive Keyword Filtering ===');
     try {
-      await fetchAndSaveConfluencePages(undefined, false); // Store Confluence in vector DB
+      await fetchAndSaveConfluencePages(ENV_VARS.TMP_DIR_PATH, false); // Store Confluence in vector DB
     } catch (confluenceError) {
       console.warn('Confluence fetch failed:', confluenceError instanceof Error ? confluenceError.message : 'Unknown error');
       console.warn('Continuing without Confluence documentation...');
