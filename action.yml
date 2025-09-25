@@ -33,7 +33,7 @@ runs:
           with: 
             repository: ${{ inputs.REPO_PATH }}
             token: ${{ inputs.PAT_TOKEN }}
-            path: ./tmp/repo
+            path: ./tmp
 
         - name: Run setup script
           shell: bash
@@ -43,4 +43,3 @@ runs:
             ls -al
             pwd
             cd tmp && ls
-            cd tmp/repo && ls
