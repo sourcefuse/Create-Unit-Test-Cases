@@ -75,7 +75,7 @@ export class ConfluenceUtil {
 
         start += limit;
         hasMorePages = pages.size >= limit;
-        
+
         // Add all pages without filtering
         allPages = [...allPages, ...pages.results];
         console.log(`Fetched ${pages.results.length} pages, total so far: ${allPages.length}`);
@@ -110,7 +110,7 @@ export class ConfluenceUtil {
 
     for (const chunk of chunks) {
       console.log(`Processing batch of ${chunk.length} pages...`);
-      
+
       // Fetch pages in parallel for this chunk
       const chunkPromises = chunk.map(async (pageId) => {
         try {
@@ -118,10 +118,10 @@ export class ConfluenceUtil {
             id: pageId,
             expand: ['body.view', 'body.storage'],
           });
-          
+
           console.log(`✓ Fetched: ${page.title} (${pageId})`);
           return page;
-          
+
         } catch (error: any) {
           console.error(`✗ Failed to fetch page ${pageId}:`, error instanceof Error ? error.message : 'Unknown error');
           return null;
@@ -146,18 +146,18 @@ export class ConfluenceUtil {
  */
 const convertStorageToMarkdown = (storageContent: string): string => {
   let markdown = storageContent;
-  
+
   // Convert headers
   markdown = markdown.replace(/<h([1-6])>(.*?)<\/h[1-6]>/g, (match, level, content) => {
     const headerLevel = '#'.repeat(parseInt(level));
     return `${headerLevel} ${stripHtmlTags(content)}\n\n`;
   });
-  
+
   // Convert paragraphs
   markdown = markdown.replace(/<p>(.*?)<\/p>/g, (match, content) => {
     return `${stripHtmlTags(content)}\n\n`;
   });
-  
+
   // Convert lists
   markdown = markdown.replace(/<ul>(.*?)<\/ul>/gs, (match, content) => {
     const items = content.match(/<li>(.*?)<\/li>/g) || [];
@@ -167,7 +167,7 @@ const convertStorageToMarkdown = (storageContent: string): string => {
     }).join('\n');
     return `${listItems}\n\n`;
   });
-  
+
   markdown = markdown.replace(/<ol>(.*?)<\/ol>/gs, (match, content) => {
     const items = content.match(/<li>(.*?)<\/li>/g) || [];
     const listItems = items.map((item: string, index: number) => {
@@ -176,28 +176,28 @@ const convertStorageToMarkdown = (storageContent: string): string => {
     }).join('\n');
     return `${listItems}\n\n`;
   });
-  
+
   // Convert code blocks
   markdown = markdown.replace(/<ac:structured-macro[^>]*ac:name="code"[^>]*>(.*?)<\/ac:structured-macro>/gs, (match, content) => {
     const codeContent = stripHtmlTags(content);
     return `\`\`\`\n${codeContent}\n\`\`\`\n\n`;
   });
-  
+
   // Convert inline code
   markdown = markdown.replace(/<code>(.*?)<\/code>/g, (match, content) => {
     return `\`${stripHtmlTags(content)}\``;
   });
-  
+
   // Convert bold and italic
   markdown = markdown.replace(/<strong>(.*?)<\/strong>/g, '**$1**');
   markdown = markdown.replace(/<em>(.*?)<\/em>/g, '*$1*');
-  
+
   // Remove remaining HTML tags
   markdown = stripHtmlTags(markdown);
-  
+
   // Clean up extra whitespace
   markdown = markdown.replace(/\n{3,}/g, '\n\n').trim();
-  
+
   return markdown;
 };
 
@@ -211,14 +211,14 @@ const matchesKeywords = (page: any, keywords: string[]): { matches: boolean; mat
   if (!keywords || keywords.length === 0) {
     return { matches: true, matchedKeywords: [] }; // No filtering if no keywords
   }
-  
+
   // Combine title and body content for searching
   const title = (page.title || '').toLowerCase();
   const content = (page.body?.storage?.value || '').toLowerCase();
   const searchableContent = `${title} ${content}`;
-  
+
   const matchedKeywords: string[] = [];
-  
+
   // Check if any keyword is present in the content
   for (const keyword of keywords) {
     const lowerKeyword = keyword.toLowerCase();
@@ -226,9 +226,9 @@ const matchesKeywords = (page: any, keywords: string[]): { matches: boolean; mat
       matchedKeywords.push(keyword);
     }
   }
-  
+
   const hasMatches = matchedKeywords.length > 0;
-  
+
   return { matches: hasMatches, matchedKeywords };
 };
 
@@ -241,39 +241,42 @@ export const formatConfluencePagesAsMarkdown = async (pages: any[]): Promise<str
   let filteredPages = pages;
   let usedKeywords: string[] = [];
   let totalFetched = pages.length;
-  
+
   // Apply keyword filtering if enabled
   if (ENV_VARS.CONFLUENCE_FILTER_ENABLED) {
     console.log(`\n🔍 Applying adaptive keyword filtering on ${pages.length} pre-fetched pages...`);
-    
+
     try {
       // Use the adaptive keyword extraction which handles the entire flow
-      const result = await extractKeywordsWithAdaptiveCount(pages);
+      const result = await extractKeywordsWithAdaptiveCount(
+        pages,
+        path.join(ENV_VARS.TMP_DIR_PATH, ENV_VARS.JIRA_MARKDOWN_FILENAME)
+      );
       filteredPages = result.filteredPages;
       usedKeywords = result.keywords;
-      
+
       console.log(`📊 Final result: ${filteredPages.length} pages selected from ${totalFetched} total pages`);
       console.log(`🔑 Used keywords: ${usedKeywords.slice(0, 5).join(', ')}${usedKeywords.length > 5 ? '...' : ''}`);
-      
+
     } catch (error) {
       console.warn('⚠️  Keyword filtering failed, using all pages:', error instanceof Error ? error.message : 'Unknown error');
       filteredPages = pages;
     }
   }
-  
+
   let content = '';
-  
+
   for (const page of filteredPages) {
     content += `## ${page.title}(${page.id}) \n\n`;
     content += page.body.storage.value.trim() + ' \n\n';
   }
-  
+
   const cleanContent = stripHtmlTags(content);
-  
-  const filteringNote = ENV_VARS.CONFLUENCE_FILTER_ENABLED 
+
+  const filteringNote = ENV_VARS.CONFLUENCE_FILTER_ENABLED
     ? `**Filtering**: Enabled (${filteredPages.length} of ${totalFetched} pages matched keywords)\n`
     : `**Filtering**: Disabled (all pages included)\n`;
-  
+
   const markdown = `# Project Documentation
 
 **Total Pages Fetched**: ${totalFetched}
@@ -301,29 +304,29 @@ ${ENV_VARS.CONFLUENCE_FILTER_ENABLED ? '*Filtered based on adaptive JIRA keyword
  * @returns Formatted markdown string
  */
 export const formatConfluencePagesWithFullContent = async (
-  pages: any[], 
+  pages: any[],
   totalFetched: number
 ): Promise<string> => {
   console.log(`\n📝 Formatting ${pages.length} pages with full content...`);
-  
+
   // Use array for efficient memory usage instead of string concatenation
   const contentParts: string[] = [];
-  
+
   for (const page of pages) {
     contentParts.push(`## ${page.title}(${page.id}) \n\n`);
-    
+
     // Use optimized content extraction
     const pageContent = extractPageContent(page);
     contentParts.push(pageContent + ' \n\n');
   }
-  
+
   const content = buildContent(contentParts);
   const cleanContent = stripHtmlTags(content);
-  
-  const filteringNote = ENV_VARS.CONFLUENCE_FILTER_ENABLED 
+
+  const filteringNote = ENV_VARS.CONFLUENCE_FILTER_ENABLED
     ? `**Filtering**: Enabled (${pages.length} of ${totalFetched} pages matched keywords)\n`
     : `**Filtering**: Disabled (all pages included)\n`;
-  
+
   const markdown = `# Project Documentation
 
 **Total Pages Fetched**: ${totalFetched}
@@ -359,15 +362,15 @@ export const fetchAndSaveConfluencePages = async (
 ): Promise<string> => {
   try {
     const confluenceUtil = new ConfluenceUtil();
-    
+
     // Phase 1: Fetch pages with minimal data for filtering
     console.log('\n=== Phase 1: Fetching pages for filtering ===');
     const minimalPages = await confluenceUtil.fetchAllSpacePages(); // No expand = minimal data
-    
+
     if (minimalPages.length === 0) {
       throw new Error('No pages found in the specified Confluence space');
     }
-    
+
     // Apply filtering and save page IDs
     let filteredPageIds: string[] = [];
     if (ENV_VARS.CONFLUENCE_FILTER_ENABLED) {
@@ -379,29 +382,29 @@ export const fetchAndSaveConfluencePages = async (
       filteredPageIds = minimalPages.map(page => page.id);
       console.log(`📊 Using all ${filteredPageIds.length} pages (filtering disabled)`);
     }
-    
+
     // Phase 2: Fetch full content for filtered pages
     console.log('\n=== Phase 2: Fetching full content for filtered pages ===');
     const fullContentPages = await confluenceUtil.fetchPagesByIds(filteredPageIds);
-    
+
     if (fullContentPages.length === 0) {
       throw new Error('No pages retrieved with full content');
     }
-    
+
     // Create markdown content with full content pages
     const markdownContent = await formatConfluencePagesWithFullContent(fullContentPages, minimalPages.length);
-    
+
     const defaultPath = path.join(process.cwd(), ENV_VARS.TMP_DIR_PATH, ENV_VARS.PROJECT_MARKDOWN_FILENAME);
     const filePath = outputPath || defaultPath;
-    
+
     const dir = path.dirname(filePath);
     await fs.ensureDir(dir);
-    
+
     await fs.writeFile(filePath, markdownContent, 'utf8');
-    
+
     console.log(`\n✅ Confluence documentation saved to: ${filePath}`);
     console.log(`📄 Processed ${fullContentPages.length} pages with full content`);
-    
+
     // Store in vector database if enabled
     if (storeInVector && ENV_VARS.VECTOR_STORE_TYPE === 'QDRANT') {
       try {
@@ -412,9 +415,9 @@ export const fetchAndSaveConfluencePages = async (
         console.warn('⚠️ Failed to store Confluence pages in vector database:', vectorError instanceof Error ? vectorError.message : 'Unknown error');
       }
     }
-    
+
     return filePath;
-    
+
   } catch (error) {
     console.error('❌ Failed to fetch and save Confluence pages:', error instanceof Error ? error.message : 'Unknown error');
     throw error;
@@ -431,14 +434,14 @@ export const createConfluenceSummary = async (
 ): Promise<string> => {
   try {
     const confluenceUtil = new ConfluenceUtil();
-    
+
     console.log('Fetching Confluence pages for summary...');
     const pages = await confluenceUtil.fetchAllSpacePages();
-    
+
     if (pages.length === 0) {
       throw new Error('No pages found in the specified Confluence space');
     }
-    
+
     let summaryContent = `# Confluence Pages Summary
 
 **Total Pages**: ${pages.length}
@@ -447,7 +450,7 @@ export const createConfluenceSummary = async (
 ---
 
 `;
-    
+
     pages.forEach((page, index) => {
       summaryContent += `## ${index + 1}. ${page.title}
 
@@ -456,23 +459,23 @@ export const createConfluenceSummary = async (
 
 `;
     });
-    
+
     summaryContent += `---
 *Summary generated from Confluence*`;
-    
+
     const defaultPath = path.join(process.cwd(), ENV_VARS.TMP_DIR_PATH, 'ConfluenceSummary.md');
     const filePath = outputPath || defaultPath;
-    
+
     const dir = path.dirname(filePath);
     await fs.ensureDir(dir);
-    
+
     await fs.writeFile(filePath, summaryContent, 'utf8');
-    
+
     console.log(`Confluence summary saved to: ${filePath}`);
     console.log(`Summarized ${pages.length} pages from Confluence space`);
-    
+
     return filePath;
-    
+
   } catch (error) {
     console.error('Failed to create Confluence summary:', error instanceof Error ? error.message : 'Unknown error');
     throw error;

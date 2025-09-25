@@ -196,7 +196,7 @@ export const fetchAndSaveJiraDetails = async (
     
     const markdownContent = formatJiraAsMarkdown(jiraIssue);
     
-    const defaultPath = path.join(process.cwd(), ENV_VARS.TMP_DIR_PATH, ENV_VARS.JIRA_MARKDOWN_FILENAME);
+    const defaultPath = path.join(ENV_VARS.TMP_DIR_PATH, ENV_VARS.JIRA_MARKDOWN_FILENAME);
     const filePath = outputPath || defaultPath;
     
     const dir = path.dirname(filePath);
