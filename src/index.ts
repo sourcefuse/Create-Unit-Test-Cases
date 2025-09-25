@@ -35,5 +35,6 @@ export const main = async (): Promise<void> => {
 };
 
 if (require.main === module) {
-  main();
+  console.log(process.env);
+  // main();
 }

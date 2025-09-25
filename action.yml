@@ -73,9 +73,10 @@ runs:
           id: timestamp
           shell: bash
           run: |
+              temp_dir=$(mktemp -d)
               echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
-              echo "TMP_DIR_PATH=${{ github.action_path }}/tmp/repo" >> $GITHUB_ENV
-              mkdir -p ${{ github.action_path }}/tmp/repo
+              echo "TMP_DIR_PATH=$temp_dir" >> $GITHUB_ENV
+              echo $temp_dir
         
         - name: Clone Repository into tmp folder
           uses: actions/checkout@v4
@@ -131,7 +132,6 @@ runs:
           run: |
               pwd
               ls ${{ github.action_path }}
-              ls ${{ github.action_path }}/tmp
               # cp -aRp ${{ github.action_path }}/tmp/* ./
               # git config user.name "Vishal Gupta"
               # git config user.email "${{ inputs.JIRA_EMAIL }}"
