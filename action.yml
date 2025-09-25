@@ -85,9 +85,11 @@ runs:
           id: install
           shell: bash
           run: |
+              pwd
+              cd ./tmp/repo/ && pwd && npm install
               cd ${{ github.action_path }} && ls
               cd ${{ github.action_path }} && npm install
-              cd ./tmp/repo/ && npm install
+              
 
         # - name: Run setup script
         #   shell: bash
