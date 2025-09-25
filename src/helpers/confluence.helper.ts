@@ -394,7 +394,7 @@ export const fetchAndSaveConfluencePages = async (
     // Create markdown content with full content pages
     const markdownContent = await formatConfluencePagesWithFullContent(fullContentPages, minimalPages.length);
 
-    const defaultPath = path.join(process.cwd(), ENV_VARS.TMP_DIR_PATH, ENV_VARS.PROJECT_MARKDOWN_FILENAME);
+    const defaultPath = path.join(ENV_VARS.TMP_DIR_PATH, ENV_VARS.PROJECT_MARKDOWN_FILENAME);
     const filePath = outputPath || defaultPath;
 
     const dir = path.dirname(filePath);
