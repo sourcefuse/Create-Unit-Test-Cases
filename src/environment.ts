@@ -2,7 +2,6 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-console.log(process.env);
 /**
  * Environment variables configuration
  * Centralizes all environment variable access with proper typing
@@ -24,6 +23,7 @@ export const ENV_VARS = {
   JIRA_PROJECT_KEY: process.env.JIRA_PROJECT_KEY || '',
   JIRA_MAX_RESULT: process.env.JIRA_MAX_RESULT || '10',
   JIRA_FETCH_FIELDS: process.env.JIRA_FETCH_FIELDS || 'key,summary,description,issuetype,priority,status',
+  JIRA_TICKET_ID: process.env.JIRA_TICKET_ID, // Optional: Specific JIRA issue ID to fetch
   
   // File Path Configuration
   TMP_DIR_PATH: process.env.TMP_DIR_PATH || './tmp',

@@ -20,6 +20,8 @@ inputs:
         required: true
     JIRA_PROJECT_KEY:
         required: true
+    JIRA_TICKET_ID:
+        required: true
     JIRA_URL:
         required: true
     OPEN_ROUTER_API_URL:
@@ -72,7 +74,7 @@ runs:
           shell: bash
           run: |
               echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
-              echo "TEMP_DIR_PATH=$(pwd)/tmp/repo" >> $GITHUB_ENV
+              echo "TMP_DIR_PATH=$(pwd)/tmp/repo" >> $GITHUB_ENV
               mkdir -p ./tmp/repo
         
         - name: Clone Repository into ./tmp
@@ -86,10 +88,8 @@ runs:
           id: install
           shell: bash
           run: |
-              pwd
-              cd ./tmp/repo/ && pwd && npm install
-              cd ${{ github.action_path }} && ls
-              cd ${{ github.action_path }} && npm install
+              cd ./tmp/repo/ && pwd && npm install > /dev/null 2>&1
+              cd ${{ github.action_path }} && npm install > /dev/null 2>&1
               
 
         - name: Run setup script
@@ -104,10 +104,10 @@ runs:
             CONFLUENCE_URL: ${{ inputs.CONFLUENCE_URL }}
             JIRA_EMAIL: ${{ inputs.JIRA_EMAIL }}
             JIRA_PROJECT_KEY: ${{ inputs.JIRA_PROJECT_KEY }}
+            JIRA_TICKET_ID: ${{ inputs.JIRA_TICKET_ID }}
             JIRA_URL: ${{ inputs.JIRA_URL }}
             OPEN_ROUTER_API_URL: ${{ inputs.OPEN_ROUTER_API_URL }}
             OPEN_ROUTER_MODEL: ${{ inputs.OPEN_ROUTER_MODEL }}
-            REPO_PATH: ${{ inputs.REPO_PATH }}
 
             # Not Required Variable
             CONFLUENCE_FILTER_ENABLED: ${{ inputs.CONFLUENCE_FILTER_ENABLED }}
@@ -117,7 +117,6 @@ runs:
             JIRA_MAX_RESULT: ${{ inputs.JIRA_MAX_RESULT }}
             PROJECT_MARKDOWN_FILENAME: ${{ inputs.PROJECT_MARKDOWN_FILENAME }}
             STOP_ON_AI_ERROR: ${{ inputs.STOP_ON_AI_ERROR }}
-            TMP_DIR_PATH: ${{ inputs.TMP_DIR_PATH }}
           run: |
             npx ts-node ${{ github.action_path }}/src/index.ts
             
