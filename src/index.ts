@@ -15,8 +15,8 @@ export const main = async (): Promise<void> => {
   }
   
   try {
-    console.log('=== Fetching JIRA Details === for JIRA_TICKET_ID:', ENV_VARS.JIRA_TICKET_ID);
-    await fetchAndSaveJiraDetails(ENV_VARS.JIRA_TICKET_ID); // JIRA data saved to file only
+    console.log('=== Fetching JIRA Details');
+    await fetchAndSaveJiraDetails(); // JIRA data saved to file only
     
     console.log('\n=== Fetching Confluence Pages with Adaptive Keyword Filtering ===');
     try {

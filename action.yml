@@ -91,12 +91,17 @@ runs:
               cd ./tmp/repo/ && pwd && npm install > /dev/null 2>&1
               cd ${{ github.action_path }} && npm install > /dev/null 2>&1
               
+        - name: Install Claude CLI
+          shell: bash
+          env:
+            ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+          run: |
+              npm install -g @anthropic-ai/claude-code
 
         - name: Run setup script
           shell: bash
           env:
             # Required Variables from Secrets
-            CLAUDE_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
             JIRA_API_TOKEN: ${{ inputs.JIRA_API_TOKEN }}
             OPEN_ROUTER_API_KEY: ${{ inputs.OPEN_ROUTER_API_KEY }}
 
@@ -119,4 +124,15 @@ runs:
             STOP_ON_AI_ERROR: ${{ inputs.STOP_ON_AI_ERROR }}
           run: |
             npx ts-node ${{ github.action_path }}/src/index.ts
+        
             
+        - name: Run Claude Commands
+          shell: bash
+          env:
+            ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+          run: |
+            claude --print --dangerously-skip-permissions < ${{ github.action_path }}/commands/generate-tests.md
+            cd ./tmp/repo/ && git status && git add . && git commit -am "update" && git push
+
+
+

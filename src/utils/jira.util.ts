@@ -130,7 +130,7 @@ export class JiraUtil {
       
       console.log(`Executing JQL search: ${jql}`);
       
-      const response = await axiosInstance.post<JiraApiResponse>('/search', {
+      const response = await axiosInstance.post<JiraApiResponse>('/search/jql', {
         jql,
         maxResults: this.maxResults,
         fields: this.fetchFields.split(','),

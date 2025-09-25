@@ -15,7 +15,8 @@
     "qdrant:start": "docker-compose -f docker-compose.qdrant.yml up -d",
     "qdrant:stop": "docker-compose -f docker-compose.qdrant.yml down",
     "qdrant:logs": "docker-compose -f docker-compose.qdrant.yml logs -f",
-    "analyze-project": "claude --model claude-3-5-sonnet-20241022 --print --dangerously-skip-permissions < commands/generate-tests.md"
+    "analyze-project": "claude --model claude-3-5-sonnet-20241022 --print --dangerously-skip-permissions < commands/generate-tests.md",
+    "clean": "find src -name '*.js' -type f -delete && rm -f debug-jira.js"
   },
   "keywords": [],
   "author": "",
