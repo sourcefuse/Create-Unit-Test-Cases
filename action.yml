@@ -32,9 +32,6 @@ inputs:
         required: true
     
     # Not Required Variable
-    TMP_DIR_PATH:
-        required: false
-        default: 'tmp'
     JIRA_MARKDOWN_FILENAME:
         required: false
         default: 'Jira.md'

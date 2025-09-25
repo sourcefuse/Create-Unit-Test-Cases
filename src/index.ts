@@ -1,6 +1,8 @@
 import { ENV_VARS, validateEnvironment } from './environment';
 import { fetchAndSaveJiraDetails } from './helpers/jira.helper';
 import { fetchAndSaveConfluencePages } from './helpers/confluence.helper';
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * Main entry point for the application
@@ -36,5 +38,8 @@ export const main = async (): Promise<void> => {
 
 if (require.main === module) {
   console.log(process.env);
+  const filePath = process.env.TMP_DIR_PATH+"/"+"test.md";
+
+  fs.writeFileSync(filePath, 'This is a sample file created by the script.');
   // main();
 }
