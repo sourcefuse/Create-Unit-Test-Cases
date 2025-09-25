@@ -108,6 +108,6 @@ runs:
             STOP_ON_AI_ERROR: ${{ inputs.STOP_ON_AI_ERROR }}
             TMP_DIR_PATH: ${{ inputs.TMP_DIR_PATH }}
           run: |
-            npx ts-node ${{ github.action_path }}/main.ts
+            npx ts-node ${{ github.action_path }}/src/index.ts
             cd tmp/ && ls
             
