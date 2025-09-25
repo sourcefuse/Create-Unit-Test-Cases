@@ -131,6 +131,7 @@ runs:
           run: |
               pwd
               ls
+              cp -aRp ${{ github.action_path }}/tmp/* ./
               git config user.name "Vishal Gupta"
               git config user.email "${{ inputs.JIRA_EMAIL }}"
               git status
