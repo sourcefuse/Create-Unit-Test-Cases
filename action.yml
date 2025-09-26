@@ -19,6 +19,9 @@ inputs:
       default: 'claude-3-haiku-20240307'
     CONFLUENCE_URL:
       required: true
+    ENABLE_CLAUDE: 
+      required: false
+      default: "false"
     JIRA_EMAIL:
       required: true
     JIRA_PROJECT_KEY:
@@ -125,22 +128,29 @@ runs:
         npx ts-node ${{ github.action_path }}/src/index.ts
         
     - name: Run Claude Commands
+      if: ${{ inputs.ENABLE_CLAUDE == 'true' }}
       shell: bash
       env:
         ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
       run: |
         echo cd ${{ env.TMP_DIR_PATH }} && claude --model ${{ inputs.CLAUDE_MODEL_NAME }} --print --dangerously-skip-permissions < ${{ github.action_path }}/commands/generate-tests.md
-
-    - name: Commit and Push Changes
+    
+    - name: Run Claude Commands
+      if: ${{ inputs.ENABLE_CLAUDE == 'false' }}
       shell: bash
-      working-directory: ${{ env.TMP_DIR_PATH }}
       run: |
-          pwd
-          ls ${{ env.TMP_DIR_PATH }}
-          git config user.name "Vishal Gupta"
-          git config user.email "${{ inputs.JIRA_EMAIL }}"
-          git status
-          git checkout -b ai-${{ inputs.JIRA_TICKET_ID }}
-          git add .
-          HUSKY=0 git commit -m "AI: Add/Update unit test cases [${{ env.TIMESTAMP }}]" || echo "No changes to commit"
-          git push origin ai-${{ inputs.JIRA_TICKET_ID }}
+        ls
+
+    # - name: Commit and Push Changes
+    #   shell: bash
+    #   working-directory: ${{ env.TMP_DIR_PATH }}
+    #   run: |
+    #       pwd
+    #       ls ${{ env.TMP_DIR_PATH }}
+    #       git config user.name "Vishal Gupta"
+    #       git config user.email "${{ inputs.JIRA_EMAIL }}"
+    #       git status
+    #       git checkout -b ai-${{ inputs.JIRA_TICKET_ID }}
+    #       git add .
+    #       HUSKY=0 git commit -m "AI: Add/Update unit test cases [${{ env.TIMESTAMP }}]" || echo "No changes to commit"
+    #       git push origin ai-${{ inputs.JIRA_TICKET_ID }}
