@@ -68,61 +68,61 @@ permissions:
 runs:
   using: 'composite' # or 'node20' if you prefer
   steps:
-    # - name: Create timestamp and export to env
-    #   id: timestamp
-    #   shell: bash
-    #   run: |
-    #     mkdir -p ${{ github.workspace }}/tmp/repo
-    #     echo "TMP_DIR_PATH=${{ github.workspace }}/tmp/repo" >> $GITHUB_ENV
-    #     echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+    - name: Create timestamp and export to env
+      id: timestamp
+      shell: bash
+      run: |
+        mkdir -p ${{ github.workspace }}/tmp/repo
+        echo "TMP_DIR_PATH=${{ github.workspace }}/tmp/repo" >> $GITHUB_ENV
+        echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
         
-    # - name: Clone Repository into tmp folder
-    #   uses: actions/checkout@v4
-    #   with: 
-    #     repository: ${{ inputs.REPO_PATH }}
-    #     token: ${{ inputs.PAT_TOKEN }}
-    #     path: ${{ env.TMP_DIR_PATH }}
+    - name: Clone Repository into tmp folder
+      uses: actions/checkout@v4
+      with: 
+        repository: ${{ inputs.REPO_PATH }}
+        token: ${{ inputs.PAT_TOKEN }}
+        path: ${{ env.TMP_DIR_PATH }}
 
-    # - name: Installing Required packages.
-    #   id: install
-    #   shell: bash
-    #   run: |
-    #     cd ${{ env.TMP_DIR_PATH }} && pwd && npm install > /dev/null 2>&1
-    #     cd ${{ github.action_path }} && npm install > /dev/null 2>&1
+    - name: Installing Required packages.
+      id: install
+      shell: bash
+      run: |
+        cd ${{ env.TMP_DIR_PATH }} && pwd && npm install > /dev/null 2>&1
+        cd ${{ github.action_path }} && npm install > /dev/null 2>&1
               
-    # - name: Install Claude CLI
-    #   shell: bash
-    #   env:
-    #     ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
-    #   run: |
-    #     npm install -g @anthropic-ai/claude-code
+    - name: Install Claude CLI
+      shell: bash
+      env:
+        ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+      run: |
+        npm install -g @anthropic-ai/claude-code
 
-    # - name: Run setup script
-    #   shell: bash
-    #   env:
-    #     # Required Variables from Secrets
-    #     JIRA_API_TOKEN: ${{ inputs.JIRA_API_TOKEN }}
-    #     OPEN_ROUTER_API_KEY: ${{ inputs.OPEN_ROUTER_API_KEY }}
+    - name: Run setup script
+      shell: bash
+      env:
+        # Required Variables from Secrets
+        JIRA_API_TOKEN: ${{ inputs.JIRA_API_TOKEN }}
+        OPEN_ROUTER_API_KEY: ${{ inputs.OPEN_ROUTER_API_KEY }}
 
-    #     # Required Variable from Variables
-    #     CONFLUENCE_URL: ${{ inputs.CONFLUENCE_URL }}
-    #     JIRA_EMAIL: ${{ inputs.JIRA_EMAIL }}
-    #     JIRA_PROJECT_KEY: ${{ inputs.JIRA_PROJECT_KEY }}
-    #     JIRA_TICKET_ID: ${{ inputs.JIRA_TICKET_ID }}
-    #     JIRA_URL: ${{ inputs.JIRA_URL }}
-    #     OPEN_ROUTER_API_URL: ${{ inputs.OPEN_ROUTER_API_URL }}
-    #     OPEN_ROUTER_MODEL: ${{ inputs.OPEN_ROUTER_MODEL }}
+        # Required Variable from Variables
+        CONFLUENCE_URL: ${{ inputs.CONFLUENCE_URL }}
+        JIRA_EMAIL: ${{ inputs.JIRA_EMAIL }}
+        JIRA_PROJECT_KEY: ${{ inputs.JIRA_PROJECT_KEY }}
+        JIRA_TICKET_ID: ${{ inputs.JIRA_TICKET_ID }}
+        JIRA_URL: ${{ inputs.JIRA_URL }}
+        OPEN_ROUTER_API_URL: ${{ inputs.OPEN_ROUTER_API_URL }}
+        OPEN_ROUTER_MODEL: ${{ inputs.OPEN_ROUTER_MODEL }}
 
-    #     # Not Required Variable
-    #     CONFLUENCE_FILTER_ENABLED: ${{ inputs.CONFLUENCE_FILTER_ENABLED }}
-    #     CONFLUENCE_PAGE_LIMIT: ${{ inputs.CONFLUENCE_PAGE_LIMIT }}
-    #     JIRA_FETCH_FIELDS: ${{ inputs.JIRA_FETCH_FIELDS }}
-    #     JIRA_MARKDOWN_FILENAME: ${{ inputs.JIRA_MARKDOWN_FILENAME }}
-    #     JIRA_MAX_RESULT: ${{ inputs.JIRA_MAX_RESULT }}
-    #     PROJECT_MARKDOWN_FILENAME: ${{ inputs.PROJECT_MARKDOWN_FILENAME }}
-    #     STOP_ON_AI_ERROR: ${{ inputs.STOP_ON_AI_ERROR }}
-    #   run: |
-    #     npx ts-node ${{ github.action_path }}/src/index.ts
+        # Not Required Variable
+        CONFLUENCE_FILTER_ENABLED: ${{ inputs.CONFLUENCE_FILTER_ENABLED }}
+        CONFLUENCE_PAGE_LIMIT: ${{ inputs.CONFLUENCE_PAGE_LIMIT }}
+        JIRA_FETCH_FIELDS: ${{ inputs.JIRA_FETCH_FIELDS }}
+        JIRA_MARKDOWN_FILENAME: ${{ inputs.JIRA_MARKDOWN_FILENAME }}
+        JIRA_MAX_RESULT: ${{ inputs.JIRA_MAX_RESULT }}
+        PROJECT_MARKDOWN_FILENAME: ${{ inputs.PROJECT_MARKDOWN_FILENAME }}
+        STOP_ON_AI_ERROR: ${{ inputs.STOP_ON_AI_ERROR }}
+      run: |
+        npx ts-node ${{ github.action_path }}/src/index.ts
         
     - name: Run Claude Commands
       shell: bash
@@ -131,16 +131,16 @@ runs:
       run: |
         echo cd ${{ env.TMP_DIR_PATH }} && claude --model ${{ inputs.CLAUDE_MODEL_NAME }} --print --dangerously-skip-permissions < ${{ github.action_path }}/commands/generate-tests.md
 
-    # - name: Commit and Push Changes
-    #   shell: bash
-    #   working-directory: ${{ env.TMP_DIR_PATH }}
-    #   run: |
-    #       pwd
-    #       ls ${{ env.TMP_DIR_PATH }}
-    #       git config user.name "Vishal Gupta"
-    #       git config user.email "${{ inputs.JIRA_EMAIL }}"
-    #       git status
-    #       git checkout -b ai-${{ inputs.JIRA_TICKET_ID }}
-    #       git add .
-    #       HUSKY=0 git commit -m "AI: Add/Update unit test cases [${{ env.TIMESTAMP }}]" || echo "No changes to commit"
-    #       git push origin ai-${{ inputs.JIRA_TICKET_ID }}
+    - name: Commit and Push Changes
+      shell: bash
+      working-directory: ${{ env.TMP_DIR_PATH }}
+      run: |
+          pwd
+          ls ${{ env.TMP_DIR_PATH }}
+          git config user.name "Vishal Gupta"
+          git config user.email "${{ inputs.JIRA_EMAIL }}"
+          git status
+          git checkout -b ai-${{ inputs.JIRA_TICKET_ID }}
+          git add .
+          HUSKY=0 git commit -m "AI: Add/Update unit test cases [${{ env.TIMESTAMP }}]" || echo "No changes to commit"
+          git push origin ai-${{ inputs.JIRA_TICKET_ID }}
