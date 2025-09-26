@@ -139,7 +139,8 @@ runs:
       if: ${{ inputs.ENABLE_CLAUDE == 'false' }}
       shell: bash
       run: |
-        ls
+        npx ts-node ${{ github.action_path }}/src/utils/openrouter-client.ts ${{ env.TMP_DIR_PATH }} custom
+        cd ${{ env.TMP_DIR_PATH }} && ls
 
     # - name: Commit and Push Changes
     #   shell: bash
