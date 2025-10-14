@@ -4,13 +4,19 @@ inputs:
     # Required Variables from Secrets
     GITHUB_TOKEN:
       required: true
-    CLAUDE_API_KEY:
-      required: true
+    # CLAUDE_API_KEY:
+    #   required: true
     JIRA_API_TOKEN:
       required: true
     OPEN_ROUTER_API_KEY:
       required: true
     PAT_TOKEN:
+      required: true
+    AWS_ACCESS_KEY_CLAUDE:
+      required: true
+    AWS_SECRET_KEY_CLAUDE:
+      required: true
+    AWS_REGION_CLAUDE:
       required: true
 
     # Required Variables from variables
@@ -21,7 +27,7 @@ inputs:
       required: true
     ENABLE_CLAUDE: 
       required: false
-      default: "false"
+      default: "true"
     JIRA_EMAIL:
       required: true
     JIRA_PROJECT_KEY:
@@ -93,12 +99,18 @@ runs:
         cd ${{ env.TMP_DIR_PATH }} && pwd && npm install > /dev/null 2>&1
         cd ${{ github.action_path }} && npm install > /dev/null 2>&1
               
+    # - name: Install Claude CLI
+    #   shell: bash
+    #   env:
+    #     ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+    #   run: |
+    #     npm install -g @anthropic-ai/claude-code
+
     - name: Install Claude CLI
       shell: bash
-      env:
-        ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
       run: |
         npm install -g @anthropic-ai/claude-code
+
 
     - name: Run setup script
       shell: bash
@@ -127,15 +139,29 @@ runs:
       run: |
         npx ts-node ${{ github.action_path }}/src/index.ts
         
-    - name: Run Claude Commands
+    # - name: Run Claude Commands
+    #   if: ${{ inputs.ENABLE_CLAUDE == 'true' }}
+    #   shell: bash
+    #   env:
+    #     ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+    #   run: |
+    #     echo cd ${{ env.TMP_DIR_PATH }} && claude --model ${{ inputs.CLAUDE_MODEL_NAME }} --print --dangerously-skip-permissions < ${{ github.action_path }}/commands/generate-tests.md
+    
+    - name: Run Claude Commands via Bedrock
       if: ${{ inputs.ENABLE_CLAUDE == 'true' }}
       shell: bash
       env:
-        ANTHROPIC_API_KEY: ${{ inputs.CLAUDE_API_KEY }}
+        CLAUDE_CODE_USE_BEDROCK:  "1"
+        AWS_REGION:               ${{ inputs.AWS_REGION_CLAUDE }}
+        ANTHROPIC_MODEL:          ${{ inputs.CLAUDE_MODEL_NAME }}
+        AWS_ACCESS_KEY_ID:        ${{ inputs.AWS_ACCESS_KEY_CLAUDE }}
+        AWS_SECRET_ACCESS_KEY:    ${{ inputs.AWS_SECRET_KEY_CLAUDE }}
       run: |
-        echo cd ${{ env.TMP_DIR_PATH }} && claude --model ${{ inputs.CLAUDE_MODEL_NAME }} --print --dangerously-skip-permissions < ${{ github.action_path }}/commands/generate-tests.md
+        ls ${{ github.action_path }}/
+        cat ${{ github.action_path }}/commands/generate-tests.md
+        cd ${{ env.TMP_DIR_PATH }} && claude --print --dangerously-skip-permissions < ${{ github.action_path }}/commands/generate-tests.md
     
-    - name: Run Claude Commands
+    - name: Run OpenRouter Commands
       if: ${{ inputs.ENABLE_CLAUDE == 'false' }}
       shell: bash
       run: |

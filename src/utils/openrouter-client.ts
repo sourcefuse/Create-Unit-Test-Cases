@@ -664,17 +664,17 @@ export async function analyzeFolderExample(folderPath: string, analysisType: 'co
 }
 
 // CLI entry point
-if (require.main === module) {
-  const args = process.argv.slice(2);
-  if (args.length > 0) {
-    const folderPath = args[0];
-    if (!folderPath) {
-      console.error('❌ Please provide a folder path as the first argument');
-      process.exit(1);
-    }
-    const analysisType = (args[1] as 'code-review' | 'documentation' | 'test-generation' | 'security-audit') || 'custom';
-    analyzeFolderExample(folderPath, analysisType).catch(console.error);
-  } else {
-    testOpenRouterConnection().catch(console.error);
-  }
-}
+// if (require.main === module) {
+//   const args = process.argv.slice(2);
+//   if (args.length > 0) {
+//     const folderPath = args[0];
+//     if (!folderPath) {
+//       console.error('❌ Please provide a folder path as the first argument');
+//       process.exit(1);
+//     }
+//     const analysisType = (args[1] as 'code-review' | 'documentation' | 'test-generation' | 'security-audit') || 'custom';
+//     analyzeFolderExample(folderPath, analysisType).catch(console.error);
+//   } else {
+//     testOpenRouterConnection().catch(console.error);
+//   }
+// }

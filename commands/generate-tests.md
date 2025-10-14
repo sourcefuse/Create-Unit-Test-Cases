@@ -4,7 +4,9 @@ You are a Senior fullstack Developer Engineer with 15+ years of experience in un
 - decide which type of repo it is, react of angular or loopback.
 - check how unit test cases are written for this repo.
 - go to the repo install all dependencies with npm i.
-- read Project.md file requirements, documents for ticket, TDD etc.
+- read project/*.md files requirements, documents for ticket, TDD etc.
 - read Jira.md file as requirement and create unit test cases in same structure as current repo follows.
 - write unit test cases for Test Driven Approach for given requirements in Jira.md
 - run tsc command to check if any typescript error is there in repo, fix it
+- at the end print all file you have created
+- 

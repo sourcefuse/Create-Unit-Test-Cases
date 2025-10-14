@@ -349,9 +349,63 @@ ${ENV_VARS.CONFLUENCE_FILTER_ENABLED ? '*Filtered based on adaptive JIRA keyword
 };
 
 /**
+ * Sanitizes page title to create a valid filename
+ * @param title - Page title
+ * @returns Sanitized filename
+ */
+const sanitizeFilename = (title: string): string => {
+  return title
+    .replace(/[<>:"/\\|?*]/g, '-') // Replace invalid filename characters
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .replace(/_{2,}/g, '_') // Replace multiple underscores with single
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing dashes
+    .substring(0, 200); // Limit filename length
+};
+
+/**
+ * Saves individual Confluence page as markdown file
+ * @param page - Confluence page object
+ * @param projectDir - Directory to save the page
+ * @returns Promise resolving to the saved file path
+ */
+const saveIndividualPage = async (page: any, projectDir: string): Promise<string> => {
+  try {
+    const sanitizedTitle = sanitizeFilename(page.title);
+    const fileName = `${sanitizedTitle}.md`;
+    const filePath = path.join(projectDir, fileName);
+
+    // Extract page content
+    const pageContent = extractPageContent(page);
+    const cleanContent = stripHtmlTags(pageContent);
+
+    // Create markdown content for individual page
+    const markdown = `# ${page.title}
+
+**Page ID**: ${page.id}
+**Generated on**: ${new Date().toISOString()}
+**Source**: Confluence Space
+
+---
+
+${cleanContent}
+
+---
+*Page generated from Confluence*
+`;
+
+    await fs.writeFile(filePath, markdown, 'utf8');
+    return filePath;
+  } catch (error) {
+    console.error(`Failed to save page ${page.title}:`, error instanceof Error ? error.message : 'Unknown error');
+    throw error;
+  }
+};
+
+/**
  * Fetches Confluence pages using two-phase approach and creates Project.md file
+ * Also saves each page as individual markdown file in ./tmp/project/ directory
  * Phase 1: Fetch minimal data for filtering and save page IDs
- * Phase 2: Fetch full content for filtered pages and save to Project.md
+ * Phase 2: Fetch full content for filtered pages and save to Project.md + individual files
  * @param outputPath - Optional output path, defaults to tmp/Project.md
  * @param storeInVector - Whether to store in vector database (default: true)
  * @returns Promise resolving to the created file path
@@ -391,6 +445,24 @@ export const fetchAndSaveConfluencePages = async (
     if (fullContentPages.length === 0) {
       throw new Error('No pages retrieved with full content');
     }
+
+    // Create project directory for individual pages
+    const projectDir = path.join(ENV_VARS.TMP_DIR_PATH, 'project');
+    await fs.ensureDir(projectDir);
+
+    // Save individual pages
+    console.log('\n📁 Saving individual Confluence pages...');
+    const savedFiles: string[] = [];
+    for (const page of fullContentPages) {
+      try {
+        const savedPath = await saveIndividualPage(page, projectDir);
+        savedFiles.push(savedPath);
+        console.log(`✓ Saved: ${path.basename(savedPath)}`);
+      } catch (error) {
+        console.error(`✗ Failed to save page: ${page.title}`, error instanceof Error ? error.message : 'Unknown error');
+      }
+    }
+    console.log(`✅ Saved ${savedFiles.length} individual pages to: ${projectDir}`);
 
     // Create markdown content with full content pages
     const markdownContent = await formatConfluencePagesWithFullContent(fullContentPages, minimalPages.length);
