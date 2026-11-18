@@ -37,10 +37,10 @@
   },
   "dependencies": {
     "@qdrant/js-client-rest": "^1.15.1",
-    "axios": "^1.12.2",
+    "axios": "^1.21.1",
     "confluence.js": "^2.1.0",
     "dotenv": "^17.2.2",
     "fs-extra": "^11.3.2",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.2"
   }
 }
